@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 import mediapipe as mp
 
-svm_model, label_encoder = joblib.load("models/face_recognizer.sav")
+svm_model, label_encoder = joblib.load("output/face_recognizer.sav")
 
 face_detector = mp.solutions.face_detection.FaceDetection()
 face_mesh = mp.solutions.face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
@@ -47,10 +47,11 @@ def predict_image(image_path):
 	if results.multi_face_landmarks:
 		face_landmarks = []
 		for landmark in results.multi_face_landmarks[0].landmark:
-			x = int(landmark.x * face_image.shape[1])
-			y = int(landmark.y * face_image.shape[0])
+			x = landmark.x * face_image.shape[1]
+			y = landmark.y * face_image.shape[0]
 			face_landmarks.append(x)
 			face_landmarks.append(y)
+			face_landmarks.append(landmark.z)
 
 		face_landmarks = np.array(face_landmarks)
 		face_data = face_landmarks.reshape(1, -1)

@@ -9,9 +9,7 @@ import mediapipe as mp
 from pathlib import Path
 from sklearn import svm
 import matplotlib.pyplot as plt
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import LabelEncoder
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, f1_score, accuracy_score, classification_report
 
@@ -55,10 +53,11 @@ for file_path in tqdm(images_list):
         if results.multi_face_landmarks:
             landmark_values = []
             for landmark in results.multi_face_landmarks[0].landmark:
-                x = int(landmark.x * face_image.shape[1])
-                y = int(landmark.y * face_image.shape[0])
+                x = landmark.x * face_image.shape[1]
+                y = landmark.y * face_image.shape[0]
                 landmark_values.append(x)
                 landmark_values.append(y)
+                landmark_values.append(landmark.z)
                 
             face_encodings_list.append(np.array(landmark_values).flatten())
             labels_list.append(file_path.split(os.path.sep)[-2])
@@ -86,7 +85,7 @@ print('Classification Report:\n', classification_report(y_test, y_pred))
 print('Accuracy Score:', accuracy_score(y_test, y_pred))
 
 print("saving the model and labels to file...")
-joblib.dump((svm_model, label_encoder), "models/face_recognizer.sav")
+joblib.dump((svm_model, label_encoder), "output/face_recognizer.sav")
 
 # classes = svm_model.classes_
 # cm = confusion_matrix(y_test, y_pred, labels=classes)
